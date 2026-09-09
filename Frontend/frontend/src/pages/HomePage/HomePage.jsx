@@ -1,8 +1,18 @@
-import { MOCK_PRODUCTS } from "../../data/mockProducts";
 import ProductGrid from "../../components/ProductGrid/ProductGrid";
+import useProducts from "../../hooks/useProducts";
 
 const HomePage = () => {
-  const featuredProducts = MOCK_PRODUCTS.slice(0, 4);
+  const { data: products, loading, error } = useProducts();
+
+  const featuredProducts = products.slice(0, 4);
+
+  if (loading) {
+    return <h2>Cargando productos...</h2>;
+  }
+
+  if (error) {
+    return <h2>Error al cargar los productos.</h2>;
+  }
 
   return (
     <div>

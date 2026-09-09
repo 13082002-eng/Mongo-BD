@@ -1,15 +1,28 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MOCK_PRODUCTS } from "../../data/mockProducts";
+import useProduct from "../../hooks/useProduct";
+import useReviews from "../../hooks/useReviews";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
 
-  const product = MOCK_PRODUCTS.find(
-    (product) => product.id === id
-  );
+  const { data: product, loading, error } = useProduct(id);
+
+  const {
+  data: reviews,
+  loading: reviewsLoading,
+  error: reviewsError,
+} = useReviews(id);
 
   const [quantity, setQuantity] = useState(1);
+
+  if (loading) {
+    return <h2>Cargando producto...</h2>;
+  }
+
+  if (error) {
+    return <h2>Error al cargar el producto.</h2>;
+  }
 
   if (!product) {
     return (
@@ -77,6 +90,31 @@ const ProductDetailPage = () => {
             </div>
           </div>
         </div>
+      </div>
+            <div className="reviews">
+        <h3>Reseñas</h3>
+
+        {reviewsLoading && <p>Cargando reseñas...</p>}
+
+        {reviewsError && (
+          <p>Error al cargar las reseñas.</p>
+        )}
+
+        {!reviewsLoading &&
+          !reviewsError &&
+          reviews.length === 0 && (
+            <p>No hay reseñas todavía.</p>
+          )}
+
+        {!reviewsLoading &&
+          !reviewsError &&
+          reviews.map((review) => (
+            <div key={review._id}>
+              <strong>{review.username}</strong>
+              <p>⭐ {review.rating}/5</p>
+              <p>{review.comment}</p>
+            </div>
+          ))}
       </div>
     </div>
   );

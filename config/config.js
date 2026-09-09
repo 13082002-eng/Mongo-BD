@@ -1,9 +1,13 @@
-// index.js ahora
-const express = require('express');
-const app = express();
-const PORT = 8080;
-const { dbConnection } = require('./config/config');
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-dbConnection();
+const dbConnection = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB conectado");
+  } catch (error) {
+    console.error("Error al conectar con MongoDB:", error.message);
+  }
+};
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+module.exports = { dbConnection };

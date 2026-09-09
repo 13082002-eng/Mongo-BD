@@ -1,13 +1,23 @@
 import { useState } from "react";
-import { MOCK_PRODUCTS } from "../../data/mockProducts";
 import ProductGrid from "../../components/ProductGrid/ProductGrid";
+import useProducts from "../../hooks/useProducts";
 
 const ProductsPage = () => {
   const [search, setSearch] = useState("");
 
-  const filteredProducts = MOCK_PRODUCTS.filter((product) =>
+  const { data: products, loading, error } = useProducts();
+
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (loading) {
+    return <h2>Cargando productos...</h2>;
+  }
+
+  if (error) {
+    return <h2>Error al cargar los productos.</h2>;
+  }
 
   return (
     <div>
