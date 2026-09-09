@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { login } from "../../api/auth";
+import { loginThunk } from "../../store/authSlice";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const emailRef = useRef(null);
+
+  const dispatch = useDispatch();
+
+  const { loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     emailRef.current.focus();
@@ -16,28 +20,22 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setFormError("");
 
     if (!email || !password) {
-      setError("Completa todos los campos.");
+      setFormError("Completa todos los campos.");
       return;
     }
 
-    try {
-      setLoading(true);
-
-      await login({
+    const result = await dispatch(
+      loginThunk({
         email,
         password,
-      });
+      })
+    );
 
+    if (loginThunk.fulfilled.match(result)) {
       alert("Login correcto");
-    } catch (err) {
-      setError(
-        err.response?.data?.message || "Error al iniciar sesión."
-      );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -70,6 +68,8 @@ const LoginPage = () => {
             placeholder="Tu contraseña"
           />
         </div>
+
+        {formError && <p>{formError}</p>}
 
         {error && <p>{error}</p>}
 

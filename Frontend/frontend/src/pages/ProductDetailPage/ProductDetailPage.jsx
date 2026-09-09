@@ -1,20 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import useProduct from "../../hooks/useProduct";
 import useReviews from "../../hooks/useReviews";
+import { addCartItem } from "../../store/cartSlice";
+import { toggleWishlist } from "../../store/wishlistSlice";
+import ReviewForm from "../../components/ReviewForm/ReviewForm";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
 
-  const { data: product, loading, error } = useProduct(id);
+  const user = useSelector((state) => state.auth.user);
+
+  const productIds = useSelector(
+    (state) => state.wishlist.productIds
+  );
+
+  const isFavorite = productIds.includes(id);
 
   const {
-  data: reviews,
-  loading: reviewsLoading,
-  error: reviewsError,
-} = useReviews(id);
+    data: product,
+    loading,
+    error,
+  } = useProduct(id);
+
+  const {
+    data: reviews,
+    loading: reviewsLoading,
+    error: reviewsError,
+  } = useReviews(id);
+
+  const [reviewList, setReviewList] = useState([]);
+
+  useEffect(() => {
+    setReviewList(reviews || []);
+  }, [reviews]);
 
   const [quantity, setQuantity] = useState(1);
+
+  const handleAddToCart = async () => {
+    const result = await dispatch(
+      addCartItem({
+        productId: id,
+        quantity,
+      })
+    );
+
+    if (addCartItem.fulfilled.match(result)) {
+      alert("Producto añadido al carrito");
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    dispatch(toggleWishlist(id));
+  };
 
   if (loading) {
     return <h2>Cargando producto...</h2>;
@@ -89,12 +130,25 @@ const ProductDetailPage = () => {
               </button>
             </div>
           </div>
+
+          <button onClick={handleAddToCart}>
+            Añadir al carrito
+          </button>
+
+          <button onClick={handleToggleWishlist}>
+            {isFavorite
+              ? "💔 Quitar de favoritos"
+              : "❤️ Añadir a favoritos"}
+          </button>
         </div>
       </div>
-            <div className="reviews">
+
+      <div className="reviews">
         <h3>Reseñas</h3>
 
-        {reviewsLoading && <p>Cargando reseñas...</p>}
+        {reviewsLoading && (
+          <p>Cargando reseñas...</p>
+        )}
 
         {reviewsError && (
           <p>Error al cargar las reseñas.</p>
@@ -102,19 +156,36 @@ const ProductDetailPage = () => {
 
         {!reviewsLoading &&
           !reviewsError &&
-          reviews.length === 0 && (
+          reviewList.length === 0 && (
             <p>No hay reseñas todavía.</p>
           )}
 
         {!reviewsLoading &&
           !reviewsError &&
-          reviews.map((review) => (
+          reviewList.map((review) => (
             <div key={review._id}>
               <strong>{review.username}</strong>
-              <p>⭐ {review.rating}/5</p>
+
+              <p>
+                ⭐ {review.rating}/5
+              </p>
+
               <p>{review.comment}</p>
             </div>
           ))}
+
+        {user && (
+          <ReviewForm
+            productId={id}
+            username={user.username}
+            onReviewCreated={(newReview) => {
+              setReviewList((current) => [
+                ...current,
+                newReview,
+              ]);
+            }}
+          />
+        )}
       </div>
     </div>
   );

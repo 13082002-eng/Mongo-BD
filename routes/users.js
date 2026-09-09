@@ -1,16 +1,19 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/User.js");
 
-// REGISTRO
+const JWT_SECRET = process.env.JWT_SECRET || "bootcamp-secret";
+
+// REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({
-        message: "Todos los campos son obligatorios",
-      });
+      return res
+        .status(400)
+        .json({ message: "Todos los campos son obligatorios" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -33,6 +36,7 @@ router.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Error al registrar el usuario",
     });
@@ -58,12 +62,26 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: "2h",
+      }
+    );
+
     res.json({
       message: "Login correcto",
+      token,
       user,
     });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       message: "Error al iniciar sesión",
     });

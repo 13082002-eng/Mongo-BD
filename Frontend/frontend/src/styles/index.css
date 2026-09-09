@@ -450,3 +450,198 @@ footer {
     max-width: 100%;
   }
 }
+
+/* =========================
+   RESEÑAS
+========================= */
+
+.reviews {
+  margin-top: 50px;
+  padding: 30px;
+  background: #f8f8f8;
+  border-radius: 16px;
+}
+
+.reviews > h3 {
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+/* Tarjeta de cada reseña */
+
+.reviews > div:not(:last-child) {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.reviews strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.reviews p {
+  margin: 7px 0;
+}
+
+/* =========================
+   FORMULARIO DE RESEÑA
+========================= */
+
+.reviews form {
+  margin-top: 35px;
+  padding: 25px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.reviews form h3 {
+  margin-bottom: 20px;
+}
+
+.reviews form label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.reviews form select,
+.reviews form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.reviews form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.reviews form button {
+  margin-top: 18px;
+  padding: 11px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #596985;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.reviews form button:hover {
+  opacity: 0.85;
+}
+
+.reviews form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mensaje de error */
+
+.reviews form p {
+  color: #c0392b;
+  margin-top: 12px;
+}
+
+
+/* =========================
+   CARRITO
+========================= */
+
+.cart-page {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.cart-page h2 {
+  font-size: 28px;
+  margin-bottom: 35px;
+}
+
+.cart-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 35px;
+  justify-items: center;
+}
+
+.cart-product {
+  width: 220px;
+  text-align: center;
+}
+
+.cart-product img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.cart-product h3 {
+  font-size: 20px;
+  margin: 10px 0;
+}
+
+.cart-product p {
+  font-size: 17px;
+  margin: 10px 0;
+}
+
+.cart-product button {
+  padding: 7px 12px;
+  border: 1px solid #777;
+  border-radius: 3px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.cart-product button:hover {
+  background: #f2f2f2;
+}
+
+/* Total */
+
+.cart-summary {
+  margin-top: 45px;
+  padding-top: 25px;
+  border-top: 1px solid #ddd;
+}
+
+.cart-summary h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.cart-summary button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #596985;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.cart-summary button:hover {
+  opacity: 0.85;
+}
+
+.cart-empty {
+  font-size: 18px;
+  margin-top: 40px;
+}
