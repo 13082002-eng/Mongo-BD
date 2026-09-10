@@ -36,4 +36,41 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// POST /products
+router.post("/", async (req, res) => {
+  try {
+    const { id, name, description, price, stock, imageUrl } = req.body;
+
+    if (!id || !name || !description || price === undefined || stock === undefined) {
+      return res.status(400).json({
+        message: "Faltan datos obligatorios",
+      });
+    }
+
+    const existingProduct = await Product.findOne({ id });
+
+    if (existingProduct) {
+      return res.status(400).json({
+        message: "Ya existe un producto con ese ID",
+      });
+    }
+
+    const product = await Product.create({
+      id,
+      name,
+      description,
+      price,
+      stock,
+      imageUrl,
+    });
+
+    res.status(201).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error al crear el producto",
+    });
+  }
+});
+
 module.exports = router;
