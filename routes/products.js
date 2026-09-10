@@ -74,3 +74,38 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
+
+// PUT /products/:id
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, description, price, stock, imageUrl } = req.body;
+
+    const product = await Product.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        name,
+        description,
+        price,
+        stock,
+        imageUrl,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Producto no encontrado",
+      });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error al actualizar el producto",
+    });
+  }
+});
