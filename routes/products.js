@@ -73,7 +73,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
 
 // PUT /products/:id
 router.put("/:id", async (req, res) => {
@@ -109,3 +108,30 @@ router.put("/:id", async (req, res) => {
     });
   }
 });
+
+// DELETE /products/:id
+router.delete("/:id", async (req, res) => {
+  try {
+    const product = await Product.findOneAndDelete({
+      id: req.params.id,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Producto no encontrado",
+      });
+    }
+
+    res.json({
+      message: "Producto eliminado correctamente",
+      product,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error al eliminar el producto",
+    });
+  }
+});
+
+module.exports = router;
