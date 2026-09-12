@@ -39,7 +39,9 @@ function AdminPage() {
 
       if (exists) {
         return currentProducts.map((product) =>
-          product.id === savedProduct.id ? savedProduct : product
+          product.id === savedProduct.id
+            ? savedProduct
+            : product
         );
       }
 
@@ -56,27 +58,29 @@ function AdminPage() {
   };
 
   const handleDelete = async (id) => {
-  const confirmed = window.confirm(
-    "¿Seguro que quieres eliminar este producto?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  try {
-    await deleteProduct(id);
-
-    setProducts((currentProducts) =>
-      currentProducts.filter((product) => product.id !== id)
+    const confirmed = window.confirm(
+      "¿Seguro que quieres eliminar este producto?"
     );
-  } catch (error) {
-    alert(
-      error.response?.data?.message ||
-        "Error al eliminar el producto"
-    );
-  }
-};
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteProduct(id);
+
+      setProducts((currentProducts) =>
+        currentProducts.filter(
+          (product) => product.id !== id
+        )
+      );
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Error al eliminar el producto"
+      );
+    }
+  };
 
   const handleCancel = () => {
     setShowForm(false);
@@ -108,9 +112,10 @@ function AdminPage() {
           : "➕ Añadir producto"}
       </button>
 
-      {showForm && (
+      {/* Formulario para añadir producto */}
+      {showForm && !editingProduct && (
         <ProductForm
-          product={editingProduct}
+          product={null}
           onProductSaved={handleProductSaved}
           onCancel={handleCancel}
         />
@@ -129,9 +134,19 @@ function AdminPage() {
           <button onClick={() => handleEdit(product)}>
             ✏️ Editar
           </button>
+
           <button onClick={() => handleDelete(product.id)}>
             🗑️ Eliminar
           </button>
+
+          {/* Formulario de edición debajo del producto */}
+          {editingProduct?.id === product.id && (
+            <ProductForm
+              product={editingProduct}
+              onProductSaved={handleProductSaved}
+              onCancel={handleCancel}
+            />
+          )}
         </div>
       ))}
     </div>
