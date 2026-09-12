@@ -2,6 +2,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/User.js");
+const auth = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET || "bootcamp-secret";
 
@@ -67,6 +68,7 @@ router.post("/login", async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
       JWT_SECRET,
       {
@@ -74,16 +76,58 @@ router.post("/login", async (req, res) => {
       }
     );
 
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 2 * 60 * 60 * 1000,
+      })
+      .json({
+        message: "Login correcto",
+        user,
+      });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Error al iniciar sesión",
+    });
+  }
+});
+
+// LOGOUT
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.json({
+    message: "Sesión cerrada correctamente",
+  });
+});
+
+
+router.get("/me", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Usuario no encontrado",
+      });
+    }
+
     res.json({
-      message: "Login correcto",
-      token,
       user,
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      message: "Error al iniciar sesión",
+      message: "Error al obtener el usuario",
     });
   }
 });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../store/authSlice";
+import { logoutThunk, selectIsAdmin } from "../../store/authSlice";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -10,14 +10,15 @@ const Header = () => {
   const navigate = useNavigate();
 
   const { token } = useSelector((state) => state.auth);
+  const isAdmin = useSelector(selectIsAdmin);
 
-  const { items } = useSelector((state) => state.cart);
+  const { items, loading } = useSelector((state) => state.cart);
   const { productIds } = useSelector((state) => state.wishlist);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    setMenuOpen(false);
-    navigate("/login");
+  const handleLogout = async () => {
+  await dispatch(logoutThunk());
+  setMenuOpen(false);
+  navigate("/login");
   };
 
   return (
@@ -43,13 +44,19 @@ const Header = () => {
           </NavLink>
 
           {token && (
-            <>
+          <>
+            {isAdmin && (
+              <NavLink to="/admin" onClick={() => setMenuOpen(false)}>
+                  👑 Admin
+              </NavLink>
+            )}
+
               <NavLink to="/wishlist" onClick={() => setMenuOpen(false)}>
                 ❤️ Favoritos ({productIds.length})
               </NavLink>
 
               <NavLink to="/cart" onClick={() => setMenuOpen(false)}>
-                🛒 Carrito ({items.length})
+                🛒 Carrito ({loading ? "..." : items.length})
               </NavLink>
 
               <NavLink to="/profile" onClick={() => setMenuOpen(false)}>

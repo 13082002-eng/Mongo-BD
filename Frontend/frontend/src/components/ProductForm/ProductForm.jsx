@@ -10,8 +10,9 @@ function ProductForm({ product, onProductSaved, onCancel }) {
     description: product?.description || "",
     price: product?.price || "",
     stock: product?.stock || "",
-    imageUrl: product?.imageUrl || "",
   });
+
+  const [image, setImage] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,24 +23,39 @@ function ProductForm({ product, onProductSaved, onCancel }) {
     });
   };
 
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (Number(formData.price) <= 0) {
-  alert("El precio debe ser mayor que 0");
-  return;
-}
+      alert("El precio debe ser mayor que 0");
+      return;
+    }
 
-if (Number(formData.stock) < 0) {
-  alert("El stock no puede ser negativo");
-  return;
-}
+    if (Number(formData.stock) < 0) {
+      alert("El stock no puede ser negativo");
+      return;
+    }
 
-    const data = {
-      ...formData,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-    };
+    if (!isEditing && !image) {
+      alert("Debes seleccionar una imagen");
+      return;
+    }
+
+    const data = new FormData();
+
+    data.append("id", formData.id);
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("price", Number(formData.price));
+    data.append("stock", Number(formData.stock));
+
+    if (image) {
+      data.append("image", image);
+    }
 
     try {
       let response;
@@ -108,14 +124,15 @@ if (Number(formData.stock) < 0) {
         required
       />
 
-      <input
-        type="text"
-        name="imageUrl"
-        placeholder="URL de la imagen"
-        value={formData.imageUrl}
-        onChange={handleChange}
-        required
-      />
+      <label>
+        Imagen del producto:
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          required={!isEditing}
+        />
+      </label>
 
       <button type="submit">
         {isEditing ? "Guardar cambios" : "Crear producto"}

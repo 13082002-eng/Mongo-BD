@@ -4,15 +4,13 @@ const JWT_SECRET = process.env.JWT_SECRET || "bootcamp-secret";
 
 const auth = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
       return res.status(401).json({
         message: "No autorizado",
       });
     }
-
-    const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(token, JWT_SECRET);
 

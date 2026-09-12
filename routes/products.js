@@ -1,7 +1,35 @@
 const express = require("express");
 const Product = require("../models/Product");
+const multer = require("multer");
+const cloudinary = require("../config/cloudinary");
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 const router = express.Router();
+
+// Configuración de Multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Función para subir una imagen a Cloudinary
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "ecommerce-products",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+
+    stream.end(fileBuffer);
+  });
+};
 
 // GET /products
 router.get("/", async (req, res) => {
@@ -37,11 +65,18 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST /products
-router.post("/", async (req, res) => {
+router.post("/", auth, admin, upload.single("image"), async (req, res) => {
   try {
-    const { id, name, description, price, stock, imageUrl } = req.body;
+    const { id, name, description, price, stock } = req.body;
 
-    if (!id || !name || !description || price === undefined || stock === undefined) {
+    if (
+      !id ||
+      !name ||
+      !description ||
+      price === undefined ||
+      stock === undefined ||
+      !req.file
+    ) {
       return res.status(400).json({
         message: "Faltan datos obligatorios",
       });
@@ -55,13 +90,16 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Subir imagen a Cloudinary
+    const result = await uploadToCloudinary(req.file.buffer);
+
     const product = await Product.create({
       id,
       name,
       description,
       price,
       stock,
-      imageUrl,
+      imageUrl: result.secure_url,
     });
 
     res.status(201).json(product);
@@ -73,21 +111,27 @@ router.post("/", async (req, res) => {
   }
 });
 
-
 // PUT /products/:id
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, admin, upload.single("image"), async (req, res) => {
   try {
-    const { name, description, price, stock, imageUrl } = req.body;
+    const { name, description, price, stock } = req.body;
+
+    const updateData = {
+      name,
+      description,
+      price,
+      stock,
+    };
+
+    // Si se selecciona una nueva imagen, subirla a Cloudinary
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      updateData.imageUrl = result.secure_url;
+    }
 
     const product = await Product.findOneAndUpdate(
       { id: req.params.id },
-      {
-        name,
-        description,
-        price,
-        stock,
-        imageUrl,
-      },
+      updateData,
       {
         new: true,
         runValidators: true,
@@ -110,7 +154,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE /products/:id
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, admin, async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({
       id: req.params.id,

@@ -35,7 +35,7 @@ const CartPage = () => {
     const result = await dispatch(checkout());
 
     if (checkout.fulfilled.match(result)) {
-      navigate("/checkout");
+      window.location.href = result.payload.url;
     }
   };
 

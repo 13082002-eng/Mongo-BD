@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginThunk } from "../../store/authSlice";
 
 const LoginPage = () => {
@@ -11,6 +11,7 @@ const LoginPage = () => {
   const emailRef = useRef(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { loading, error } = useSelector((state) => state.auth);
 
@@ -35,7 +36,7 @@ const LoginPage = () => {
     );
 
     if (loginThunk.fulfilled.match(result)) {
-      alert("Login correcto");
+      navigate("/");
     }
   };
 

@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Layout from "../components/Layout/Layout";
 import PrivateRoute from "../components/PrivateRoute/PrivateRoute";
+import AdminRoute from "../components/AdminRoute/AdminRoute";
 
 import HomePage from "../pages/HomePage/HomePage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage";
@@ -13,6 +14,7 @@ import CartPage from "../pages/CartPage/CartPage";
 import WishlistPage from "../pages/WishlistPage/WishlistPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import CheckoutSuccessPage from "../pages/CheckoutSuccessPage/CheckoutSuccessPage";
+import AdminPage from "../pages/AdminPage/AdminPage";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +50,7 @@ const router = createBrowserRouter([
             path: "cart",
             element: <CartPage />,
           },
-          { 
+          {
             path: "wishlist",
             element: <WishlistPage />,
           },
@@ -59,9 +61,22 @@ const router = createBrowserRouter([
           {
             path: "checkout",
             element: <CheckoutSuccessPage />,
-        },
+          },
         ],
       },
+
+      // Rutas de administrador
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            path: "admin",
+            element: <AdminPage />,
+          },
+        ],
+      },
+
+      // Página 404
       {
         path: "*",
         element: <NotFoundPage />,
