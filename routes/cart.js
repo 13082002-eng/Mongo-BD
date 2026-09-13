@@ -4,6 +4,9 @@ const auth = require("../middleware/auth");
 const stripe = require("../config/stripe");
 const Product = require("../models/Product");
 
+const FRONTEND_URL =
+  process.env.FRONTEND_URL || "http://localhost:5175";
+
 const router = express.Router();
 
 // Obtener carrito
@@ -211,8 +214,8 @@ router.post("/checkout", auth, async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: "http://localhost:5175/checkout",
-      cancel_url: "http://localhost:5175/cart",
+      success_url: `${FRONTEND_URL}/checkout`,
+      cancel_url: `${FRONTEND_URL}/cart`,
     });
 
     res.json({
