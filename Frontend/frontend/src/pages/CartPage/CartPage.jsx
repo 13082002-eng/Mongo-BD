@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import {
   fetchCart,
+  addCartItem,
+  decreaseCartItem,
   removeCartItem,
   checkout,
 } from "../../store/cartSlice";
@@ -26,6 +28,19 @@ const CartPage = () => {
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
+
+  const handleIncrease = (productId) => {
+    dispatch(
+      addCartItem({
+        productId,
+        quantity: 1,
+      })
+    );
+  };
+
+  const handleDecrease = (productId) => {
+    dispatch(decreaseCartItem(productId));
+  };
 
   const handleRemove = (productId) => {
     dispatch(removeCartItem(productId));
@@ -91,28 +106,57 @@ const CartPage = () => {
                     alt={product.name}
                   />
 
-                  <h3>{product.name}</h3>
+                  <div className="cart-product-info">
+                    <h3>{product.name}</h3>
 
-                  <p>
-                    {product.price.toFixed(2)} €
-                  </p>
+                    <p className="cart-product-price">
+                      {product.price.toFixed(2)} €
+                    </p>
 
-                  <p>
-                    Cantidad: {item.quantity}
-                  </p>
+                    <div className="cart-quantity">
+                      <span>Cantidad:</span>
 
-                  <p>
-                    Subtotal:{" "}
-                    {(product.price * item.quantity).toFixed(2)} €
-                  </p>
+                      <div className="cart-quantity-controls">
+                        <button
+                          className="cart-quantity-button"
+                          onClick={() =>
+                            handleDecrease(item.productId)
+                          }
+                        >
+                          −
+                        </button>
 
-                  <button
-                    onClick={() =>
-                      handleRemove(item.productId)
-                    }
-                  >
-                    Eliminar del carrito
-                  </button>
+                        <span className="cart-quantity-value">
+                          {item.quantity}
+                        </span>
+
+                        <button
+                          className="cart-quantity-button"
+                          onClick={() =>
+                            handleIncrease(item.productId)
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="cart-subtotal">
+                      Subtotal:{" "}
+                      <strong>
+                        {(product.price * item.quantity).toFixed(2)} €
+                      </strong>
+                    </p>
+
+                    <button
+                      className="cart-remove-button"
+                      onClick={() =>
+                        handleRemove(item.productId)
+                      }
+                    >
+                      🗑️ Eliminar
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -121,7 +165,10 @@ const CartPage = () => {
           <div className="cart-summary">
             <h3>Total: {total.toFixed(2)} €</h3>
 
-            <button onClick={handleCheckout}>
+            <button
+              className="cart-checkout-button"
+              onClick={handleCheckout}
+            >
               Finalizar compra
             </button>
           </div>

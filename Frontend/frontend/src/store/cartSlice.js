@@ -35,7 +35,7 @@ export const addCartItem = createAsyncThunk(
   }
 );
 
-// Eliminar producto del carrito
+// Eliminar producto completo del carrito
 export const removeCartItem = createAsyncThunk(
   "cart/removeCartItem",
   async (productId, { rejectWithValue }) => {
@@ -44,7 +44,27 @@ export const removeCartItem = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error al eliminar del carrito"
+        error.response?.data?.message ||
+          "Error al eliminar del carrito"
+      );
+    }
+  }
+);
+
+// Restar una unidad del producto
+export const decreaseCartItem = createAsyncThunk(
+  "cart/decreaseCartItem",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/cart/${productId}`, {
+        quantity: -1,
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Error al modificar el carrito"
       );
     }
   }
@@ -59,7 +79,8 @@ export const checkout = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error al realizar el checkout"
+        error.response?.data?.message ||
+          "Error al realizar el checkout"
       );
     }
   }
@@ -108,7 +129,7 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
-      // REMOVE ITEM
+      // REMOVE ITEM COMPLETELY
       .addCase(removeCartItem.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,6 +139,20 @@ const cartSlice = createSlice({
         state.items = action.payload;
       })
       .addCase(removeCartItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // DECREASE ITEM
+      .addCase(decreaseCartItem.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(decreaseCartItem.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+      })
+      .addCase(decreaseCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -45,28 +45,30 @@ const ProductsPage = () => {
     <div>
       <h2>Catálogo de productos</h2>
 
-      <input
-        type="text"
-        placeholder="Buscar productos..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="product-filters">
+        <input
+          type="text"
+          placeholder="Buscar productos..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-      >
-        <option value="">Ordenar por...</option>
-        <option value="priceAsc">
-          Precio: menor a mayor
-        </option>
-        <option value="priceDesc">
-          Precio: mayor a menor
-        </option>
-        <option value="nameAsc">
-          Nombre: A-Z
-        </option>
-      </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <option value="">Ordenar por...</option>
+          <option value="priceAsc">
+            Precio: menor a mayor
+          </option>
+          <option value="priceDesc">
+            Precio: mayor a menor
+          </option>
+          <option value="nameAsc">
+            Nombre: A-Z
+          </option>
+        </select>
+      </div>
 
       <ProductGrid products={filteredProducts} />
     </div>

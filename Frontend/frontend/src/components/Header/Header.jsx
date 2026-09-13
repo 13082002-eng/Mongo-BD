@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutThunk, selectIsAdmin } from "../../store/authSlice";
 
@@ -8,6 +8,7 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { token } = useSelector((state) => state.auth);
   const isAdmin = useSelector(selectIsAdmin);
@@ -52,23 +53,25 @@ const Header = () => {
             )}
 
               <NavLink to="/wishlist" onClick={() => setMenuOpen(false)}>
-                ❤️ Favoritos ({productIds.length})
+                <span>❤️ Favoritos ({productIds.length})</span>
               </NavLink>
 
-              <NavLink to="/cart" onClick={() => setMenuOpen(false)}>
-                🛒 Carrito ({loading ? "..." : items.length})
+<             NavLink to="/cart" onClick={() => setMenuOpen(false)}>
+                <span>🛒 Carrito ({loading ? "..." : items.length})</span>
               </NavLink>
 
               <NavLink to="/profile" onClick={() => setMenuOpen(false)}>
                 👤 Perfil
               </NavLink>
 
+              {location.pathname === "/profile" && (
               <button
                 className="logout-button"
                 onClick={handleLogout}
               >
                 🚪 Cerrar sesión
               </button>
+          )}
             </>
           )}
 

@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getProducts,
-  deleteProduct,
-} from "../../api/products";
+import { getProducts, deleteProduct } from "../../api/products";
 import ProductForm from "../../components/ProductForm/ProductForm";
 
 function AdminPage() {
@@ -15,9 +12,7 @@ function AdminPage() {
   const loadProducts = async () => {
     try {
       setLoading(true);
-
       const response = await getProducts();
-
       setProducts(response.data);
       setError("");
     } catch (err) {
@@ -39,9 +34,7 @@ function AdminPage() {
 
       if (exists) {
         return currentProducts.map((product) =>
-          product.id === savedProduct.id
-            ? savedProduct
-            : product
+          product.id === savedProduct.id ? savedProduct : product
         );
       }
 
@@ -62,17 +55,13 @@ function AdminPage() {
       "¿Seguro que quieres eliminar este producto?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       await deleteProduct(id);
 
       setProducts((currentProducts) =>
-        currentProducts.filter(
-          (product) => product.id !== id
-        )
+        currentProducts.filter((product) => product.id !== id)
       );
     } catch (error) {
       alert(
@@ -96,59 +85,86 @@ function AdminPage() {
   }
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
+    <div className="admin-page">
+      <div className="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Bienvenido al panel de administración</p>
 
-      <p>Bienvenido al panel de administración</p>
+        <button
+          className="admin-add-button"
+          onClick={() => {
+            setEditingProduct(null);
+            setShowForm(!showForm);
+          }}
+        >
+          {showForm && !editingProduct
+            ? "❌ Cancelar"
+            : "➕ Añadir producto"}
+        </button>
+      </div>
 
-      <button
-        onClick={() => {
-          setEditingProduct(null);
-          setShowForm(!showForm);
-        }}
-      >
-        {showForm && !editingProduct
-          ? "❌ Cancelar"
-          : "➕ Añadir producto"}
-      </button>
-
-      {/* Formulario para añadir producto */}
       {showForm && !editingProduct && (
-        <ProductForm
-          product={null}
-          onProductSaved={handleProductSaved}
-          onCancel={handleCancel}
-        />
+        <div className="admin-form-container">
+          <ProductForm
+            product={null}
+            onProductSaved={handleProductSaved}
+            onCancel={handleCancel}
+          />
+        </div>
       )}
 
-      <h2>Productos</h2>
-
-      {products.map((product) => (
-        <div key={product.id}>
-          <h3>{product.name}</h3>
-
-          <p>Precio: {product.price} €</p>
-
-          <p>Stock: {product.stock}</p>
-
-          <button onClick={() => handleEdit(product)}>
-            ✏️ Editar
-          </button>
-
-          <button onClick={() => handleDelete(product.id)}>
-            🗑️ Eliminar
-          </button>
-
-          {/* Formulario de edición debajo del producto */}
-          {editingProduct?.id === product.id && (
-            <ProductForm
-              product={editingProduct}
-              onProductSaved={handleProductSaved}
-              onCancel={handleCancel}
-            />
-          )}
+      <div className="admin-products">
+        <div className="admin-products-header">
+          <h2>Productos</h2>
+          <span>{products.length} productos</span>
         </div>
-      ))}
+
+        <div className="admin-product-list">
+          {products.map((product) => (
+            <div className="admin-product-card" key={product.id}>
+              <div className="admin-product-info">
+                <h3>{product.name}</h3>
+
+                <div className="admin-product-data">
+                  <span>
+                    <strong>Precio:</strong> {product.price} €
+                  </span>
+
+                  <span>
+                    <strong>Stock:</strong> {product.stock}
+                  </span>
+                </div>
+              </div>
+
+              <div className="admin-product-actions">
+                <button
+                  className="admin-edit-button"
+                  onClick={() => handleEdit(product)}
+                >
+                  ✏️ Editar
+                </button>
+
+                <button
+                  className="admin-delete-button"
+                  onClick={() => handleDelete(product.id)}
+                >
+                  🗑️ Eliminar
+                </button>
+              </div>
+
+              {editingProduct?.id === product.id && (
+                <div className="admin-edit-form">
+                  <ProductForm
+                    product={editingProduct}
+                    onProductSaved={handleProductSaved}
+                    onCancel={handleCancel}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

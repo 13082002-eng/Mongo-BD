@@ -108,6 +108,7 @@ const ProductDetailPage = () => {
 
             <div className="quantity-controls">
               <button
+                className="quantity-button"
                 onClick={() =>
                   setQuantity((current) =>
                     Math.max(1, current - 1)
@@ -117,9 +118,12 @@ const ProductDetailPage = () => {
                 −
               </button>
 
-              <span>{quantity}</span>
+              <span className="quantity-value">
+                {quantity}
+              </span>
 
               <button
+                className="quantity-button"
                 onClick={() =>
                   setQuantity((current) =>
                     Math.min(product.stock, current + 1)
@@ -131,15 +135,25 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          <button onClick={handleAddToCart}>
-            Añadir al carrito
-          </button>
+          <div className="product-actions">
+            <button
+              className="add-cart-button"
+              onClick={handleAddToCart}
+            >
+              🛒 Añadir al carrito
+            </button>
 
-          <button onClick={handleToggleWishlist}>
-            {isFavorite
-              ? "💔 Quitar de favoritos"
-              : "❤️ Añadir a favoritos"}
-          </button>
+            <button
+              className={`wishlist-button ${
+                isFavorite ? "favorite" : ""
+              }`}
+              onClick={handleToggleWishlist}
+            >
+              {isFavorite
+                ? "💔 Quitar de favoritos"
+                : "❤️ Añadir a favoritos"}
+            </button>
+          </div>
         </div>
       </div>
 
