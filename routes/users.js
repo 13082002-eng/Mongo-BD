@@ -12,9 +12,9 @@ router.post("/register", async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Todos los campos son obligatorios" });
+      return res.status(400).json({
+        message: "Todos los campos son obligatorios",
+      });
     }
 
     const existingUser = await User.findOne({ email });
@@ -76,11 +76,13 @@ router.post("/login", async (req, res) => {
       }
     );
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 2 * 60 * 60 * 1000,
       })
       .json({
@@ -98,10 +100,12 @@ router.post("/login", async (req, res) => {
 
 // LOGOUT
 router.post("/logout", (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
 
   res.json({
@@ -109,7 +113,7 @@ router.post("/logout", (req, res) => {
   });
 });
 
-
+// GET ME
 router.get("/me", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
