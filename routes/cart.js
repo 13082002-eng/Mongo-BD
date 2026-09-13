@@ -71,7 +71,7 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
-// Eliminar producto del carrito
+// Eliminar producto completo del carrito
 router.delete("/:productId", auth, async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId: req.user.id });
@@ -93,6 +93,49 @@ router.delete("/:productId", auth, async (req, res) => {
     console.error(error);
     res.status(500).json({
       message: "Error al eliminar del carrito",
+    });
+  }
+});
+
+// Restar una unidad de un producto del carrito
+router.patch("/:productId", auth, async (req, res) => {
+  try {
+    const cart = await Cart.findOne({
+      userId: req.user.id,
+    });
+
+    if (!cart) {
+      return res.status(404).json({
+        message: "Carrito no encontrado",
+      });
+    }
+
+    const item = cart.items.find(
+      (item) => item.productId === req.params.productId
+    );
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Producto no encontrado en el carrito",
+      });
+    }
+
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    } else {
+      cart.items = cart.items.filter(
+        (item) => item.productId !== req.params.productId
+      );
+    }
+
+    await cart.save();
+
+    res.json(cart.items);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Error al modificar el carrito",
     });
   }
 });
